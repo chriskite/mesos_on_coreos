@@ -1,6 +1,4 @@
-FROM ubuntu:latest
-
-MAINTAINER tim@magnetic.io
+FROM ubuntu:14.04
 
 # This Dockerfile does the basic install of Mesosphere stack on CoreOS using the Ubuntu base Docker container.
 # Installation details mostly copied from  https://mesosphere.io/learn/run-docker-on-mesosphere/
@@ -40,11 +38,9 @@ RUN sudo ln -sf /usr/bin/docker.io /usr/local/bin/docker
 RUN sudo sed -i '$acomplete -F _docker docker' /etc/bash_completion.d/docker.io
 
 # install mesos, marathon and deimos
-RUN sudo apt-get -y install mesos=0.19.1-1.0.ubuntu1404
+RUN sudo apt-get -y install mesos=0.21.0-1.0.ubuntu1404
 
-RUN sudo apt-get -y install marathon=0.6.1-1.1
-
-RUN sudo apt-get -y install deimos=0.2.3
+RUN sudo apt-get -y install marathon=0.7.5-1.0
 
 # Add the bootstrap script
 
