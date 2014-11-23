@@ -95,8 +95,6 @@ function start_zookeeper {
 
 function start_slave {
 
-    set_deimos
-
     MASTER=`echo $1 | cut -d '=' -f2`
 
     # using ETCD or not?
@@ -106,7 +104,7 @@ function start_slave {
     echo ${MASTER} > /etc/mesos/zk
     echo /var/lib/mesos > /etc/mesos-slave/work_dir
     echo external > /etc/mesos-slave/isolation
-    echo /usr/local/bin/deimos > /etc/mesos-slave/containerizer_path
+    # echo /usr/local/bin/deimos > /etc/mesos-slave/containerizer_path
     echo ${MAIN_IP}  > /etc/mesos-slave/ip
     echo host:${MAIN_IP}  >/etc/mesos-slave/attributes
 
@@ -185,15 +183,6 @@ function start_marathon {
         echo -e  "${normal}==> info: `date` - Marathon with master ${MASTER_MARATHON} is running"
         sleep 10
     done
-
-}
-
-function set_deimos {
-
-    # Set the Deimos configuration Dockerfile
-    echo "[docker]"                          > /etc/deimos.cfg
-    echo "[log]"                            >> /etc/deimos.cfg
-    echo "console: INFO"                    >> /etc/deimos.cfg
 
 }
 
