@@ -111,7 +111,7 @@ function start_slave {
     echo -e  "${bold}==> info: Mesos slave will try to register with a master at ${MASTER}"
     echo -e  "${normal}==> info: Starting slave..."
 
-    /usr/bin/mesos-init-wrapper slave > /dev/null 2>&1 &
+    /usr/bin/mesos-init-wrapper slave 2>&1 &
 
 	# wait for the slave to start
     sleep 1 && while [[ -z $(netstat -lnt | awk "\$6 == \"LISTEN\" && \$4 ~ \".$SLAVE_PORT\" && \$1 ~ tcp") ]] ; do
@@ -142,7 +142,7 @@ function start_master {
 
     echo -e  "${normal}==> info: Starting Mesos master..."
 
-    /usr/bin/mesos-init-wrapper master > /dev/null 2>&1 &
+    /usr/bin/mesos-init-wrapper master  2>&1 &
 
 	# wait for the master to start
     sleep 1 && while [[ -z $(netstat -lnt | awk "\$6 == \"LISTEN\" && \$4 ~ \".$MASTER_PORT\" && \$1 ~ tcp") ]] ; do
@@ -260,18 +260,17 @@ if [[ ! -z ${MASTER_IP} ]]; then
 
     start_master --etcd=true
 
-    start_slave --master=zk://localhost:2181/mesos --etcd=true
-
-    # start Marathon
-    echo -e  "${bold}==> info: Starting Marathon in a separate container..."
-    docker run --rm --name marathon -p 8080:8080 tnolet/mesos-on-coreos:1.0 marathon --master=zk://${MAIN_IP}:2181/mesos &
-
-
     # While the master is running, keep publishing its IP to ETCD
     while [[ ! -z $(netstat -lnt | awk "\$6 == \"LISTEN\" && \$4 ~ \".$MASTER_PORT\" && \$1 ~ tcp") ]] ; do
 	    curl -L http://${ETCD}/v2/keys${ETCD_PATH}/master -XPUT -d value=${MAIN_IP} -d ttl=${ETCD_TTL} >/dev/null 2>&1
 		sleep $(($ETCD_TTL/2)) # sleep for half the TTL
     done
+
+    start_slave --master=zk://localhost:2181/mesos --etcd=true
+
+    # start Marathon
+    echo -e  "${bold}==> info: Starting Marathon in a separate container..."
+    docker run --rm --name marathon -p 8080:8080 chriskite/mesos-on-coreos:latest marathon --master=zk://${MAIN_IP}:2181/mesos &
 
     exit 1
 fi
