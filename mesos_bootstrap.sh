@@ -103,8 +103,6 @@ function start_slave {
     # set the slave parameters
     echo ${MASTER} > /etc/mesos/zk
     echo /var/lib/mesos > /etc/mesos-slave/work_dir
-    echo external > /etc/mesos-slave/isolation
-    # echo /usr/local/bin/deimos > /etc/mesos-slave/containerizer_path
     echo ${MAIN_IP}  > /etc/mesos-slave/ip
     echo host:${MAIN_IP}  >/etc/mesos-slave/attributes
 
