@@ -1,13 +1,12 @@
 # Mesos-on-coreos
 
-An Ubuntu container for Apache Mesos and Marathon on CoreOS. You can use Deimos in conjunction with Marathon and Mesos
-to run Docker containers on the CoreOS host that is hosting this container.
+An Ubuntu container for Apache Mesos and Marathon on CoreOS.
 For more info on Mesos and Marathon, please visit
 [mesosphere.io](http://www.mesosphere.io)
 
 ## Usage
 
-This container has a basic install of Zookeeper, Mesos, Marathon and Deimos. It kick starts a `mesos_bootstrap.sh`
+This container has a basic install of Zookeeper, Mesos, and Marathon. It kick starts a `mesos_bootstrap.sh`
 script to configure all the components. For this, it needs some environment variables to be passed in using the `-e` flag.
 The `MAIN_IP` and `DOCKER0_IP` are required and have no default. 
 
@@ -22,7 +21,7 @@ This container relies on a working ETCD connection, typically used with CoreOS.
 
 When no arguments are passed into this script, it will try to dynamically configure a Mesos cluster consisting of:  
 - 1 node running a Master, Zookeeper, Marathon and a local slave. Marathon runs in a separate docker container.    
-- x slave nodes, depending on the amount of nodes you spin up. The slaves only run the Mesos slave process and Deimos.  
+- x slave nodes, depending on the amount of nodes you spin up. The slaves only run the Mesos slave process.  
 
 Discovery of the Master's IP is done using ETCD. For this to work, all nodes should be in 
 the same ETCD cluster. 
