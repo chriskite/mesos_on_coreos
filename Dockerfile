@@ -20,13 +20,7 @@ RUN sudo apt-key adv --keyserver keyserver.ubuntu.com --recv E56151BF
 # update repos
 RUN sudo apt-get -y update
 
-RUN sudo apt-get -y install curl python-setuptools python-pip python-dev python-protobuf
-
-# install zookeeperd
-RUN sudo apt-get -y install zookeeperd
-
-# set an initial id for zookeeper
-RUN echo 1 | sudo dd of=/var/lib/zookeeper/myid
+RUN sudo apt-get -y install curl python-setuptools python-pip python-dev python-protobuf ruby
 
 # Install and run Docker
 # http://docs.docker.io/installation/ubuntulinux/ for more details
@@ -42,8 +36,7 @@ RUN sudo apt-get -y install mesos=0.21.0-1.0.ubuntu1404
 
 RUN sudo apt-get -y install marathon=0.7.5-1.0
 
-# Add the bootstrap script
-
+ADD ./zookeepers.rb /usr/local/bin/zookeepers.rb
 ADD ./mesos_bootstrap.sh /usr/local/bin/mesos_bootstrap.sh
 
 # use the mesos_bootstrap.sh script to start

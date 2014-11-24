@@ -9,8 +9,6 @@
 ##  $MAIN_IP                - the IP of the host running Docker to which Mesos master and slave can bind (required)
 ##  $DOCKER0_IP             - the IP assigned to the docker0 interface onthe CoreOS host
 ##  $ETCD_PORT              - the port on which ETCD runs on CoreOS (default: 4001)
-##  $ETCD_MESOS_PATH        - the path in ETCD where we store Mesos related data (default: /mesos)
-##  $ETCD_TTL               - the TTL used in retrying ETCD calls
 ##
 ##  Usage:
 ##
@@ -55,9 +53,7 @@ normal="\e[0m"
 export MAIN_IP=${MAIN_IP}
 export MESOS_BOOTSTRAP_VERSION=1.0
 
-
 echo -e  "${bold}==> Starting Mesos/CoreOS Bootstrap on $MAIN_IP (version $MESOS_BOOTSTRAP_VERSION)${normal}"
-
 
 # configure docker
 export DOCKER0_IP=${DOCKER0_IP}
@@ -67,7 +63,6 @@ export DOCKER="$DOCKER0_IP:$DOCKER_PORT"
 # configure Mesos
 export MASTER_PORT=${MASTER_PORT:-5050}
 export SLAVE_PORT=${SLAVE_PORT:-5051}
-
 
 MAX_RETRIES_CONNECT=10
 retry=0
@@ -168,14 +163,11 @@ case "$1" in
         print_auto_mode
 esac
 
+export ZOOKEEPERS=$(/usr/local/bin/zookeepers.rb $EXHIBITOR_HOST)
 
 start_master
 
 start_slave --master=zk://${ZOOKEEPERS}/mesos
-
-# start Marathon
-echo -e  "${bold}==> info: Starting Marathon in a separate container..."
-docker run --rm --name marathon -p 8080:8080 chriskite/mesos-on-coreos:latest marathon --master=zk://${ZOOKEEPERS}/mesos --zk=zk://${ZOOKEEPERS}/marathon &
 
 # while the Master runs, keep the Docker container running
 while [[ ! -z $(netstat -lnt | awk "\$6 == \"LISTEN\" && \$4 ~ \".$MASTER_PORT\" && \$1 ~ tcp") ]] ; do
