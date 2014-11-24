@@ -121,7 +121,7 @@ function start_master {
 }
 
 function start_marathon {
-    MASTER_MARATHON=`echo $1 | cut -d '=' -f2`
+    MASTER_MARATHON="zk://${ZOOKEEPERS}/marathon"
 
     echo $MASTER_MARATHON > /etc/mesos/master
     echo $MASTER_MARATHON > /etc/mesos/zk
@@ -154,6 +154,8 @@ function print_auto_mode {
 
 }
 
+export ZOOKEEPERS=$(/usr/local/bin/zookeepers.rb $EXHIBITOR_HOST)
+
 # Catch the command line options.
 case "$1" in
     marathon)
@@ -163,8 +165,6 @@ case "$1" in
     *)
         print_auto_mode
 esac
-
-export ZOOKEEPERS=$(/usr/local/bin/zookeepers.rb $EXHIBITOR_HOST)
 
 start_master
 
