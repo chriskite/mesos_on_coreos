@@ -83,6 +83,7 @@ function start_slave {
     # set the slave parameters
     echo ${ZOOKS} > /etc/mesos/zk
     echo docker,mesos > /etc/mesos-slave/containerizers
+    echo '5mins' > /etc/mesos-slave/executor_registration_timeout
     echo /var/lib/mesos > /etc/mesos-slave/work_dir
     echo ${MAIN_IP}  > /etc/mesos-slave/ip
     echo host:${MAIN_IP}  >/etc/mesos-slave/attributes
@@ -122,6 +123,7 @@ function start_master {
 
 function start_marathon {
     MASTER_MARATHON="zk://${ZOOKEEPERS}/mesos"
+    export MARATHON_TASK_LAUNCH_TIMEOUT=300000
 
     echo $MASTER_MARATHON > /etc/mesos/master
     echo $MASTER_MARATHON > etc/mesos/zk
