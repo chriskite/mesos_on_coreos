@@ -174,7 +174,7 @@ start_slave --master=zk://${ZOOKEEPERS}/mesos
 
 # start Marathon
 echo -e  "${bold}==> info: Starting Marathon in a separate container..."
-docker run --rm --name marathon -p 8080:8080 chriskite/mesos-on-coreos:latest marathon --master=zk://${ZOOKEEPERS}/mesos &
+docker run --rm --name marathon -p 8080:8080 chriskite/mesos-on-coreos:latest marathon --master=zk://${ZOOKEEPERS}/mesos --zk=zk://${ZOOKEEPERS}/marathon &
 
 # while the Master runs, keep the Docker container running
 while [[ ! -z $(netstat -lnt | awk "\$6 == \"LISTEN\" && \$4 ~ \".$MASTER_PORT\" && \$1 ~ tcp") ]] ; do
