@@ -23,5 +23,5 @@ ExecStop=/usr/bin/docker stop -t 30 %n
 Restart=on-failure
 
 [X-Fleet]
-#Global=true
+Global=true
 MachineMetadata=mesos=true
