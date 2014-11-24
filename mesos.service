@@ -14,7 +14,10 @@ ExecStart=/usr/bin/bash -c \
 -e MAIN_IP=`ifconfig eth0 | grep 'inet ' | awk '{print $2}'` \
 -e DOCKER0_IP=`ifconfig docker0 | grep 'inet ' | awk '{print $2}'` \
 -e EXHIBITOR_HOST=$(etcdctl get /services/exhibitor | tr -d '\n') \
--v /var/lib/docker/btrfs/subvolumes:/var/lib/docker/btrfs/subvolumes -v /var/run/docker.sock:/var/run/docker.sock chriskite/mesos-on-coreos:latest"
+-v /var/lib/docker/btrfs/subvolumes:/var/lib/docker/btrfs/subvolumes \
+-v /sys/fs/cgroup:/sys/fs/cgroup \
+-v /var/run/docker.sock:/var/run/docker.sock \
+chriskite/mesos-on-coreos:latest"
 
 ExecStop=/usr/bin/docker stop -t 30 %n
 Restart=on-failure
