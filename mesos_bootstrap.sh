@@ -121,10 +121,11 @@ function start_master {
 }
 
 function start_marathon {
-    MASTER_MARATHON="zk://${ZOOKEEPERS}/marathon"
+    MASTER_MARATHON="zk://${ZOOKEEPERS}/mesos"
+    ZOOKS_MARATHON="zk://${ZOOKEEPERS}/marathon"
 
     echo $MASTER_MARATHON > /etc/mesos/master
-    echo $MASTER_MARATHON > /etc/mesos/zk
+    echo $ZOOKS_MARATHON > /etc/mesos/zk
 
     if [ ! -d /etc/marathon/conf ]; then
         mkdir -p /etc/marathon/conf
