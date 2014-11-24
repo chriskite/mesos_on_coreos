@@ -13,9 +13,9 @@ ExecStartPre=-/usr/bin/docker kill %n
 ExecStartPre=-/usr/bin/docker rm %n
 ExecStartPre=/usr/bin/docker pull chriskite/mesos-on-coreos:latest
 
-ExecStart=/bin/bash -c '\
-docker run --rm --name marathon -p 8080:8080 -e EXHIBITOR_HOST=$(etcdctl get /services/exhibitor | tr -d '\n') chriskite/mesos-on-coreos:latest marathon \
-'
+ExecStart=/bin/bash -c \
+"docker run --rm --name marathon -p 8080:8080 \
+-e EXHIBITOR_HOST=$(etcdctl get /services/exhibitor | tr -d '\n') chriskite/mesos-on-coreos:latest marathon"
 
 ExecStop=/usr/bin/docker stop %n
 ExecStop=/usr/bin/docker rm %n

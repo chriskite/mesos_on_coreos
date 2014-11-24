@@ -92,12 +92,13 @@ function start_slave {
 
     /usr/bin/mesos-init-wrapper slave 2>&1 &
 
-	# wait for the slave to start
+   	# wait for the slave to start
     sleep 1 && while [[ -z $(netstat -lnt | awk "\$6 == \"LISTEN\" && \$4 ~ \".$SLAVE_PORT\" && \$1 ~ tcp") ]] ; do
 	    echo -e  "${normal}==> info: Waiting for Mesos slave to come online..."
 	    sleep 3;
-	done
-	echo -e  "${normal}==> info: Mesos slave started on port ${SLAVE_PORT}"
+	  done
+
+	  echo -e  "${normal}==> info: Mesos slave started on port ${SLAVE_PORT}"
 }
 
 function start_master {
