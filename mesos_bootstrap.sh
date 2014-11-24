@@ -121,11 +121,11 @@ function start_master {
 }
 
 function start_marathon {
-    MASTER_MARATHON="zk://${ZOOKEEPERS}/mesos"
-    ZOOKS_MARATHON="zk://${ZOOKEEPERS}/marathon"
+    export MARATHON_MASTER="zk://${ZOOKEEPERS}/mesos"
+    export MARATHON_ZK="zk://${ZOOKEEPERS}/marathon"
 
-    echo $MASTER_MARATHON > /etc/mesos/master
-    echo $ZOOKS_MARATHON > /etc/mesos/zk
+    echo $MARATHON_MASTER > /etc/mesos/master
+    echo $MARATHON_ZK > /etc/mesos/zk
 
     if [ ! -d /etc/marathon/conf ]; then
         mkdir -p /etc/marathon/conf
@@ -136,7 +136,7 @@ function start_marathon {
 
     # while marathon runs, keep the Docker container running
     while [[ ! -z $(ps -ef | grep marathon | grep -v grep) ]] ; do
-        echo -e  "${normal}==> info: `date` - Marathon with master ${MASTER_MARATHON} is running"
+        echo -e  "${normal}==> info: `date` - Marathon with master ${MARATHON_MASTER} is running"
         sleep 10
     done
 
