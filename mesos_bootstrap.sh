@@ -87,6 +87,7 @@ function start_slave {
 
     # set the slave parameters
     echo ${ZOOKS} > /etc/mesos/zk
+    echo docker,mesos > /etc/mesos-slave/containerizers
     echo /var/lib/mesos > /etc/mesos-slave/work_dir
     echo ${MAIN_IP}  > /etc/mesos-slave/ip
     echo host:${MAIN_IP}  >/etc/mesos-slave/attributes
