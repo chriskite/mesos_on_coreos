@@ -24,4 +24,4 @@ Restart=on-failure
 
 [X-Fleet]
 Global=true
-MachineMetadata=mesos=true
+MachineMetadata=app=mesos
