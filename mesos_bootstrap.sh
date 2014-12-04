@@ -106,7 +106,6 @@ function start_master {
 
     echo $MAIN_IP > /etc/mesos-master/ip
     echo in_memory > /etc/mesos/registry
-    echo ${MESOS_CLUSTER} > /etc/mesos/cluster
     echo "zk://${ZOOKEEPERS}/mesos" > /etc/mesos/zk
 
     echo -e  "${normal}==> info: Starting Mesos master with ZooKeepers zk://${ZOOKEEPERS}/mesos ..."
