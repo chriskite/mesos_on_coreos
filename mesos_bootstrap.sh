@@ -83,7 +83,6 @@ function start_slave {
     # set the slave parameters
     echo ${ZOOKS} > /etc/mesos/zk
     echo docker,mesos > /etc/mesos-slave/containerizers
-    echo ${MESOS_ATTRIBUTES} > /etc/mesos-slave/attributes
     echo '5mins' > /etc/mesos-slave/executor_registration_timeout
     echo /var/lib/mesos > /etc/mesos-slave/work_dir
     echo ${MAIN_IP}  > /etc/mesos-slave/ip
@@ -91,11 +90,6 @@ function start_slave {
 
     echo -e  "${bold}==> info: Mesos slave will coordinate with ZooKeepers ${ZOOKS}"
     echo -e  "${normal}==> info: Starting slave..."
-
-    if [ -z "$DEBUG" ]
-    then
-      /bin/bash
-    fi
 
     /usr/bin/mesos-init-wrapper slave 2>&1 &
 
