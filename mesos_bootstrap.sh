@@ -92,6 +92,11 @@ function start_slave {
     echo -e  "${bold}==> info: Mesos slave will coordinate with ZooKeepers ${ZOOKS}"
     echo -e  "${normal}==> info: Starting slave..."
 
+    if [ -z "$DEBUG" ]
+    then
+      /bin/bash
+    fi
+
     /usr/bin/mesos-init-wrapper slave 2>&1 &
 
    	# wait for the slave to start
@@ -112,7 +117,7 @@ function start_master {
 
     echo -e  "${normal}==> info: Starting Mesos master with ZooKeepers zk://${ZOOKEEPERS}/mesos ..."
 
-    /usr/bin/mesos-init-wrapper master  2>&1 &
+    /usr/bin/mesos-init-wrapper master 2>&1 &
 
     # wait for the master to start
     sleep 1 && while [[ -z $(netstat -lnt | awk "\$6 == \"LISTEN\" && \$4 ~ \".$MASTER_PORT\" && \$1 ~ tcp") ]] ; do
