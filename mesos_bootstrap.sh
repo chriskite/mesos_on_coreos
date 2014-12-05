@@ -1,45 +1,5 @@
 #!/bin/bash
 
-########################################################################################################################
-##
-##
-##  Mesos_bootstrap.sh relies on the following environment variables. The MAIN_IP and DOCKER0_IP are required and have
-##  no default. You should pass them into the Docker container using the -e flag.
-##
-##  $MAIN_IP                - the IP of the host running Docker to which Mesos master and slave can bind (required)
-##  $DOCKER0_IP             - the IP assigned to the docker0 interface onthe CoreOS host
-##  $ETCD_PORT              - the port on which ETCD runs on CoreOS (default: 4001)
-##
-##  Usage:
-##
-##  When no arguments are passed into this script, it will try to dynamically configure a Mesos cluster consisting of:
-##  - 1 node running a Master, Zookeeper, Marathon and a local Slave
-##  - x slave nodes, depending on the amount of nodes you spin up
-##
-##  Discovery of the Master's IP is done using ETCD. For this to work, all nodes should be in the same ETCD cluster.
-##  If automagic setup doesn't work, you can also pass in arguments and flag to set up Mesos manually:
-##
-##
-##
-##  For example, when you want to start a master
-##
-##  $ ./mesos_bootstrap.sh master`
-##
-##  When starting a slave you need to pass in the Master's Zookeeper address
-##
-##  $ ./mesos_bootstrap.sh slave --master=zk://172.17.8.101:2181/mesos
-##
-##  Starting a Marathon instance is the same as a slave
-##
-##  $ ./mesos_bootstrap.sh marathon --master=zk://172.17.8.101:2181/mesos --etcd=false
-##
-##  This script is partly based on the great work by deis:
-##  https://github.com/deis/
-##
-## @todo: replace flags with REAL flags that don't depend on the position in cmd line
-##
-########################################################################################################################
-
 # set font types
 bold="\e[1;36m"
 normal="\e[0m"
@@ -97,15 +57,7 @@ function start_slave {
     echo -e  "${bold}==> info: Mesos slave will coordinate with ZooKeepers ${ZOOKS}"
     echo -e  "${normal}==> info: Starting slave..."
 
-    /usr/bin/mesos-init-wrapper slave 2>&1 &
-
-   	# wait for the slave to start
-    sleep 1 && while [[ -z $(netstat -lnt | awk "\$6 == \"LISTEN\" && \$4 ~ \".$SLAVE_PORT\" && \$1 ~ tcp") ]] ; do
-	    echo -e  "${normal}==> info: Waiting for Mesos slave to come online..."
-	    sleep 3;
-	  done
-
-	  echo -e  "${normal}==> info: Mesos slave started on port ${SLAVE_PORT}"
+    /usr/bin/mesos-init-wrapper slave 2>&1
 }
 
 function start_master {
@@ -116,15 +68,7 @@ function start_master {
 
     echo -e  "${normal}==> info: Starting Mesos master with ZooKeepers zk://${ZOOKEEPERS}/mesos ..."
 
-    /usr/bin/mesos-init-wrapper master 2>&1 &
-
-    # wait for the master to start
-    sleep 1 && while [[ -z $(netstat -lnt | awk "\$6 == \"LISTEN\" && \$4 ~ \".$MASTER_PORT\" && \$1 ~ tcp") ]] ; do
-	    echo -e  "${normal}==> info: Waiting for Mesos master to come online..."
-	    sleep 3;
-    done
-
-    echo -e  "${normal}==> info: Mesos master started on port ${MASTER_PORT}"
+    /usr/bin/mesos-init-wrapper master 2>&1
 }
 
 function start_marathon {
@@ -140,14 +84,9 @@ function start_marathon {
 
     echo -e "${normal}==> info: Marathon master ${MASTER_MARATHON}"
 
-    
-    if [ -z "$MARATHON_HTTP_CREDENTIALS" ]
-    then
-      echo ${MARATHON_HTTP_CREDENTIALS} > /etc/marathon/conf/http_credentials
-    fi
-
+    echo ${MARATHON_HTTP_CREDENTIALS} > /etc/marathon/conf/http_credentials
     echo "http_callback" > /etc/marathon/conf/event_subscriber
-    service marathon start > /dev/null 2>&1 &
+    service marathon start 2>&1 &
 
     # while marathon runs, keep the Docker container running
     while [[ ! -z $(ps -ef | grep marathon | grep -v grep) ]] ; do
@@ -158,39 +97,17 @@ function start_marathon {
     exit 2
 }
 
-function print_usage {
-
-    echo "not implemented yet"
-
-}
-
-function print_auto_mode {
-
-    echo -e  "${normal}==> info: No flags or parameters were given, starting auto discovery..."
-
-}
-
 export ZOOKEEPERS=$(/usr/local/bin/zookeepers.rb $EXHIBITOR_HOST)
 
 # Catch the command line options.
 case "$1" in
     marathon)
         start_marathon $2;;
-    help)
-        print_usage;;
-    *)
-        print_auto_mode
+    master)
+        start_master;;
+    slave)
+        start_slave --master=zk://${ZOOKEEPERS}/mesos;;
 esac
-
-start_master
-
-start_slave --master=zk://${ZOOKEEPERS}/mesos
-
-# while the Master runs, keep the Docker container running
-while [[ ! -z $(netstat -lnt | awk "\$6 == \"LISTEN\" && \$4 ~ \".$MASTER_PORT\" && \$1 ~ tcp") ]] ; do
-    echo -e  "${normal}==> info: `date` - Mesos master is running on port ${MASTER_PORT}"
-    sleep 10
-done
 
 exit 1
 
