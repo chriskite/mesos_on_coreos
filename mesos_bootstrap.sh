@@ -46,7 +46,7 @@ function start_slave {
     echo '5mins' > /etc/mesos-slave/executor_registration_timeout
     echo /var/lib/mesos > /etc/mesos-slave/work_dir
 
-    if [ -z "$SLAVE_ATTRIBUTES" ]
+    if [ ! -z "$SLAVE_ATTRIBUTES" ]
     then
       echo ${SLAVE_ATTRIBUTES} > /etc/mesos-slave/attributes
     fi
@@ -84,7 +84,12 @@ function start_marathon {
 
     echo -e "${normal}==> info: Marathon master ${MASTER_MARATHON}"
 
-    echo ${MARATHON_HTTP_CREDENTIALS} > /etc/marathon/conf/http_credentials
+
+    if [ ! -z "$MARATHON_HTTP_CREDENTIALS" ]
+    then
+      echo ${MARATHON_HTTP_CREDENTIALS} > /etc/marathon/conf/http_credentials
+    fi
+
     echo "http_callback" > /etc/marathon/conf/event_subscriber
     service marathon start 2>&1 &
 
