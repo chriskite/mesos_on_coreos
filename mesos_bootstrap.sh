@@ -132,13 +132,19 @@ function start_marathon {
     export MARATHON_TASK_LAUNCH_TIMEOUT=300000
 
     echo $MASTER_MARATHON > /etc/mesos/master
-    echo $MASTER_MARATHON > etc/mesos/zk
+    echo $MASTER_MARATHON > /etc/mesos/zk
 
     if [ ! -d /etc/marathon/conf ]; then
         mkdir -p /etc/marathon/conf
     fi
 
     echo -e "${normal}==> info: Marathon master ${MASTER_MARATHON}"
+
+    
+    if [ -z "$MARATHON_HTTP_CREDENTIALS" ]
+    then
+      echo ${MARATHON_HTTP_CREDENTIALS} > /etc/marathon/conf/http_credentials
+    fi
 
     echo "http_callback" > /etc/marathon/conf/event_subscriber
     service marathon start > /dev/null 2>&1 &
