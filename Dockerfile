@@ -41,4 +41,4 @@ ADD ./mesos_bootstrap.sh /usr/local/bin/mesos_bootstrap.sh
 
 # use the mesos_bootstrap.sh script to start
 
-CMD "/usr/local/bin/mesos_bootstrap.sh"
+ENTRYPOINT ["/usr/local/bin/mesos_bootstrap.sh"]

@@ -85,6 +85,12 @@ function start_slave {
     echo docker,mesos > /etc/mesos-slave/containerizers
     echo '5mins' > /etc/mesos-slave/executor_registration_timeout
     echo /var/lib/mesos > /etc/mesos-slave/work_dir
+
+    if [ -z "$SLAVE_ATTRIBUTES" ]
+    then
+      echo ${SLAVE_ATTRIBUTES} > /etc/mesos-slave/attributes
+    fi
+
     echo ${MAIN_IP}  > /etc/mesos-slave/ip
     echo host:${MAIN_IP}  >/etc/mesos-slave/attributes
 
@@ -126,10 +132,13 @@ function start_marathon {
     export MARATHON_TASK_LAUNCH_TIMEOUT=300000
 
     echo $MASTER_MARATHON > /etc/mesos/master
+    echo $MASTER_MARATHON > etc/mesos/zk
 
     if [ ! -d /etc/marathon/conf ]; then
         mkdir -p /etc/marathon/conf
     fi
+
+    echo -e "${normal}==> info: Marathon master ${MASTER_MARATHON}"
 
     echo "http_callback" > /etc/marathon/conf/event_subscriber
     service marathon start > /dev/null 2>&1 &
