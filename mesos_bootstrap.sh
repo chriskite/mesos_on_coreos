@@ -49,10 +49,10 @@ function start_slave {
     if [ ! -z "$SLAVE_ATTRIBUTES" ]
     then
       echo ${SLAVE_ATTRIBUTES} > /etc/mesos-slave/attributes
+      echo -e  "${bold}==> info: Mesos slave will have attributes ${SLAVE_ATTRIBUTES}"
     fi
 
     echo ${MAIN_IP}  > /etc/mesos-slave/ip
-    echo host:${MAIN_IP}  >/etc/mesos-slave/attributes
 
     echo -e  "${bold}==> info: Mesos slave will coordinate with ZooKeepers ${ZOOKS}"
     echo -e  "${normal}==> info: Starting slave..."
