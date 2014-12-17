@@ -52,6 +52,11 @@ function start_slave {
       echo -e  "${bold}==> info: Mesos slave will have attributes ${SLAVE_ATTRIBUTES}"
     fi
 
+    if [ ! -z "$HOSTNAME" ]
+    then
+      echo ${HOSTNAME} > /etc/mesos-slave/hostname
+    fi
+
     echo ${MAIN_IP}  > /etc/mesos-slave/ip
 
     echo -e  "${bold}==> info: Mesos slave will coordinate with ZooKeepers ${ZOOKS}"
@@ -65,6 +70,11 @@ function start_master {
     echo $MAIN_IP > /etc/mesos-master/ip
     echo in_memory > /etc/mesos/registry
     echo "zk://${ZOOKEEPERS}/mesos" > /etc/mesos/zk
+
+    if [ ! -z "$HOSTNAME" ]
+    then
+      echo ${HOSTNAME} > /etc/mesos-master/hostname
+    fi
 
     echo -e  "${normal}==> info: Starting Mesos master with ZooKeepers zk://${ZOOKEEPERS}/mesos ..."
 
@@ -88,6 +98,11 @@ function start_marathon {
     if [ ! -z "$MARATHON_HTTP_CREDENTIALS" ]
     then
       echo ${MARATHON_HTTP_CREDENTIALS} > /etc/marathon/conf/http_credentials
+    fi
+
+    if [ ! -z "$HOSTNAME" ]
+    then
+      echo ${HOSTNAME} > /etc/marathon/conf/hostname
     fi
 
     echo "http_callback" > /etc/marathon/conf/event_subscriber
