@@ -17,24 +17,29 @@ RUN echo "deb http://repos.mesosphere.io/$(lsb_release -is | tr '[:upper:]' '[:l
 
 RUN sudo apt-key adv --keyserver keyserver.ubuntu.com --recv E56151BF
 
-# update repos
+# Get things we need to add the java repo
 RUN sudo apt-get -y update
+RUN sudo apt-get -y install curl python-setuptools python-pip python-dev python-protobuf ruby python-software-properties software-properties-common
 
-RUN sudo apt-get -y install curl python-setuptools python-pip python-dev python-protobuf ruby
+# add the java repo and install java 8
+RUN sudo add-apt-repository ppa:webupd8team/java
+RUN sudo apt-get -y update
+# accept the oracle license non-interactively
+RUN echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections
+RUN echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections
+RUN sudo apt-get -y install oracle-java8-installer oracle-java8-set-default
 
 # Install and run Docker
-# http://docs.docker.io/installation/ubuntulinux/ for more details
 #  We only use the client part. We bind the the docker.sock from the host to the container.
-RUN sudo apt-get -y install docker.io
-
-RUN sudo ln -sf /usr/bin/docker.io /usr/local/bin/docker
-
-RUN sudo sed -i '$acomplete -F _docker docker' /etc/bash_completion.d/docker.io
+RUN apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+RUN echo "deb http://apt.dockerproject.org/repo ubuntu-trusty main" > /etc/apt/sources.list.d/docker.list
+RUN apt-get -y update && apt-get -y purge lxc-docker*
+RUN apt-get install -y docker-engine=1.7.1-0~trusty
 
 # install mesos, marathon and deimos
-RUN sudo apt-get -y install mesos=0.22.1-1.0.ubuntu1404
+RUN sudo apt-get -y install mesos=0.25.0-0.2.70.ubuntu1404
 
-RUN sudo apt-get -y install marathon=0.8.1-1.0.171.ubuntu1404
+RUN sudo apt-get -y install marathon=0.11.1-1.0.432.ubuntu1404
 
 ADD ./zookeepers.rb /usr/local/bin/zookeepers.rb
 ADD ./mesos_bootstrap.sh /usr/local/bin/mesos_bootstrap.sh
