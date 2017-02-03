@@ -27,17 +27,7 @@ export SLAVE_PORT=${SLAVE_PORT:-5051}
 MAX_RETRIES_CONNECT=10
 retry=0
 
-# Set locale: this is required by the standard Mesos startup scripts
-echo -e  "${normal}==> info: Setting locale to en_US.UTF-8..."
-locale-gen en_US.UTF-8 > /dev/null 2>&1
-
-# Start syslog if not started....
-echo -e  "${normal}==> info: Starting syslog..."
-service rsyslog start > /dev/null 2>&1
-
-
 function start_slave {
-
     ZOOKS=`echo $1 | cut -d '=' -f2`
 
     # set the slave parameters
@@ -60,13 +50,12 @@ function start_slave {
     echo ${MAIN_IP}  > /etc/mesos-slave/ip
 
     echo -e  "${bold}==> info: Mesos slave will coordinate with ZooKeepers ${ZOOKS}"
-    echo -e  "${normal}==> info: Starting slave..."
 
-    /usr/bin/mesos-init-wrapper slave 2>&1
+    mkdir -p /etc/services/mesos-slave
+    cp /app/run-slave.sh /etc/services/mesos-slave/run
 }
 
 function start_master {
-
     echo $MAIN_IP > /etc/mesos-master/ip
     echo in_memory > /etc/mesos/registry
     echo "zk://${ZOOKEEPERS}/mesos" > /etc/mesos/zk
@@ -78,12 +67,12 @@ function start_master {
 
     echo -e  "${normal}==> info: Starting Mesos master with ZooKeepers zk://${ZOOKEEPERS}/mesos ..."
 
-    /usr/bin/mesos-init-wrapper master 2>&1
+    mkdir -p /etc/services/mesos-master
+    cp /app/run-master /etc/services/mesos-master/run
 }
 
 function start_marathon {
     MASTER_MARATHON="zk://${ZOOKEEPERS}/mesos"
-    export MARATHON_TASK_LAUNCH_TIMEOUT=300000
 
     echo $MASTER_MARATHON > /etc/mesos/master
     echo $MASTER_MARATHON > /etc/mesos/zk
@@ -106,18 +95,12 @@ function start_marathon {
     fi
 
     echo "http_callback" > /etc/marathon/conf/event_subscriber
-    service marathon start 2>&1 &
 
-    # while marathon runs, keep the Docker container running
-    while [[ ! -z $(ps -ef | grep marathon | grep -v grep) ]] ; do
-        echo -e  "${normal}==> info: `date` - Marathon with master ${MASTER_MARATHON} is running"
-        sleep 10
-    done
-
-    exit 2
+    mkdir -p /etc/services/marathon
+    cp /app/run-marathon /etc/services/marathon/run
 }
 
-export ZOOKEEPERS=$(/usr/local/bin/zookeepers.rb $EXHIBITOR_HOST)
+export ZOOKEEPERS=$(/app/zookeepers.rb $EXHIBITOR_HOST)
 
 # Catch the command line options.
 case "$1" in
@@ -129,7 +112,4 @@ case "$1" in
         start_slave --master=zk://${ZOOKEEPERS}/mesos;;
 esac
 
-exit 1
-
-wait
-
+exec /sbin/my_init
