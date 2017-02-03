@@ -68,7 +68,7 @@ function start_master {
     echo -e  "${normal}==> info: Starting Mesos master with ZooKeepers zk://${ZOOKEEPERS}/mesos ..."
 
     mkdir -p /etc/service/mesos-master
-    cp /app/run-master /etc/service/mesos-master/run
+    cp /app/run-master.sh /etc/service/mesos-master/run
 }
 
 function start_marathon {
@@ -97,7 +97,7 @@ function start_marathon {
     echo "http_callback" > /etc/marathon/conf/event_subscriber
 
     mkdir -p /etc/service/marathon
-    cp /app/run-marathon /etc/service/marathon/run
+    cp /app/run-marathon.sh /etc/service/marathon/run
 }
 
 export ZOOKEEPERS=$(/app/zookeepers.rb $EXHIBITOR_HOST)
